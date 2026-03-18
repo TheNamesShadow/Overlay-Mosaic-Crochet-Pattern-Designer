@@ -101,6 +101,19 @@ server <- function(input, output) {
                                 }
                         }
                 }
+                
+                # Removing stacked X stitches
+                first_stitch_of_third_row <- 2 * st_per_row + 1
+                for (i in first_stitch_of_third_row:nrow(image_df)) {
+                        if (image_df$stitch[i] == "") {
+                                image_df$stitch[i] <- image_df$stitch[i]
+                        } else if (image_df$stitch[i - st_per_row] == "X") {
+                                image_df$stitch[i] <- ""
+                                if (image_df$color[i - st_per_row] == "#000000ff") {
+                                        image_df$color[i - st_per_row] <- "#ffffffff"
+                                } else {image_df$color[i - st_per_row] <- "#000000ff"}
+                        }
+                }
 
                 # Adding row color indicators
                 image_df <- image_df %>% mutate(color = case_when(
@@ -113,7 +126,7 @@ server <- function(input, output) {
                         TRUE ~ stitch
                 ))
                 
-                # Creating crochet chart (set output dimensions to 5000 by 5000 pixels)
+                # Creating crochet chart
                 image_df$stitch <- factor(image_df$stitch, levels = c("", "X", "S"))
                 image_df$color <- factor(image_df$color, levels = c("#ffffffff", "#000000ff"))
                 
